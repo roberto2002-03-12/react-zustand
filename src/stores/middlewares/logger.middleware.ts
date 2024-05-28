@@ -17,12 +17,12 @@ type LoggerImpl = <T extends unknown>(
 const loggerImpl: LoggerImpl = (f, name) => (set, get, store) => {
   const loggedSet: typeof set = (...a) => {
     set(...a)
-    console.log(...(name ? [`${name}:`] : []), get())
+    // console.log(...(name ? [`${name}:`] : []), get())
   }
   const setState = store.setState
   store.setState = (...a) => {
     setState(...a)
-    console.log(...(name ? [`${name}:`] : []), store.getState())
+    // console.log(...(name ? [`${name}:`] : []), store.getState())
   }
 
   return f(loggedSet, get, store)
