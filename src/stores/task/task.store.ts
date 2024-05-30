@@ -2,7 +2,7 @@ import { StateCreator, create } from 'zustand';
 import { v4 } from 'uuid';
 // import { produce } from 'immer';
 
-import { devtools } from 'zustand/middleware';
+import { devtools, persist } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
 
 import { ITask, TaskStatus } from '../../interfaces'
@@ -60,12 +60,12 @@ const storeApi: StateCreator<ITaskState, [["zustand/devtools", never], ["zustand
   addTask: (title: string, status: TaskStatus) => {
     const newTask = { id: v4(), title, status }
 
-    // set(state => ({
-    //   tasks: {
-    //     ...state.tasks,
-    //     [newTask.id]: newTask
-    //   }
-    // }))
+    set(state => ({
+      tasks: {
+        ...state.tasks,
+        [newTask.id]: newTask
+      }
+    }))
 
     // Requiere npm i immer
     // opción 1 con paquete immer
@@ -74,14 +74,21 @@ const storeApi: StateCreator<ITaskState, [["zustand/devtools", never], ["zustand
     // }))
 
     // opción 2 con middleware immer nativo de zustand
-    set(state => {
-      state.tasks[newTask.id] = newTask;
-    })
+    // set(state => {
+    //   state.tasks[newTask.id] = newTask;
+    // })
   }
 });
 
 export const useTaskStore = create<ITaskState>()(
   devtools(
-    immer(storeApi)
+    persist(
+      // si colocas immer y persist, estarás obligado a cambiar todos
+      // los metodos del set(state) usando immer, en mi caso no lo voy
+      // a usar
+      // immer(storeApi),
+      storeApi,
+      { name: 'task-store' }
+    )
   )
 );
